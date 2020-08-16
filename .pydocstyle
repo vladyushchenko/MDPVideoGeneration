@@ -1,0 +1,5 @@
+# vim: ft=cfg
+[pydocstyle]
+inherit = false
+ignore = D100,D104,D105,D200,D202,D203,D107,D212
+match = .*\.py
