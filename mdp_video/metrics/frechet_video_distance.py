@@ -4,15 +4,19 @@ Minimal Reference implementation for the Frechet Video Distance (FVD).
 FVD is a metric for the quality of video generation models. It is
 inspired by the FID (Frechet Inception Distance) used for images, but
 uses a different embedding to be better suitable for videos.
+
+
+Code is taken from following repository (Apache 2.0 License)
+https://github.com/google-research/google-research/blob/master/frechet_video_distance/frechet_video_distance.py
 """
 import argparse
 from copy import deepcopy
 from typing import Any, Tuple
 
 import numpy as np
+from tqdm import tqdm
 import tensorflow as tf
 import tensorflow_hub as hub
-from tqdm import tqdm
 
 from mdp_video.loaders import Loader
 from mdp_video.util import to_numpy, RealBatchSampler

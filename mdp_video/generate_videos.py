@@ -43,13 +43,13 @@ from functools import partial
 from typing import Tuple, Any
 
 import cv2
-import docopt
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import torch
 from PIL import Image
 from tqdm import tqdm
+import docopt
 
 from mdp_video.loaders.ucf_loader import make_dataset, video_loader
 from mdp_video.loaders.video_loaders import Loader

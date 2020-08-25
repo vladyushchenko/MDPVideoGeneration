@@ -1,11 +1,11 @@
 import signal
 from typing import Any, List, Generator, Dict, Tuple, Optional
 
-import docopt
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from torchvision import utils as vu
+import docopt
 
 
 class LoggerDict(dict):

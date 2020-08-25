@@ -6,9 +6,9 @@ import os
 import time
 from typing import Any, List
 
-import docopt
 import torch
 from tqdm import tqdm
+import docopt
 
 import mdp_video.util as util
 from mdp_video.logger import Logger

@@ -7,12 +7,12 @@ Licensed under the CC BY-NC-ND 4.0 license (https://creativecommons.org/licenses
 import os
 from typing import Any, Dict
 
-import docopt
 import torch
 import torch.optim as optim
-import torchviz
 from torch import nn
 from torch.autograd import Variable
+import torchviz
+import docopt
 
 import mdp_video.util as util
 

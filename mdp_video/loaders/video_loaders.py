@@ -3,14 +3,15 @@ import sys
 import warnings
 from typing import Callable, Tuple, Any, Optional
 
-import chainer
-import docopt
 import numpy as np
 import torch
 import torch.utils.data
 from PIL import Image
 from torch.nn.functional import interpolate
 from torchvision import transforms
+import docopt
+import chainer
+
 
 from mdp_video.loaders.ucf_loader import SplittedVideoDataset
 from mdp_video.util import to_numpy, RealBatchSampler

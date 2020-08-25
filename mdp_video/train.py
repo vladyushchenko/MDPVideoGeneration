@@ -63,9 +63,9 @@ Options:
 """
 import random
 
-import docopt
 import numpy as np
 import torch
+import docopt
 
 from mdp_video.trainers import Trainer
 

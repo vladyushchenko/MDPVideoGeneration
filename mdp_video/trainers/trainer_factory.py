@@ -5,10 +5,10 @@ import logging
 import os
 from typing import Any, Optional
 
-import docopt
 import torch
 import torchvision.transforms
 from torch.utils.data import DataLoader
+import docopt
 
 import mdp_video.models as models
 import mdp_video.util as util

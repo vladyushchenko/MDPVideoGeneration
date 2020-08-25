@@ -1,13 +1,13 @@
 import os
 from typing import Any, Dict, List
 
-import docopt
 import torch
 import torch.optim as optim
-import torchviz
-
 from torch import nn
 from torch.autograd import Variable
+
+import torchviz
+import docopt
 
 from mdp_video.util import show_batch
 
