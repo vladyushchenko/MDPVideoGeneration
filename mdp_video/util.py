@@ -36,16 +36,14 @@ class Flags:
         :param args: program arguments
         :param learning_rate: learning rate
         """
-        self.use_categories = args["--use_categories"]
-        self.use_infogan = args["--use_infogan"]
-        self.save_graph = args["--save_graph"]
-        self.log_folder = args["<log_folder>"]
-        self.optimizer = args["--optimizer"]
+        self.use_categories = args.dim_z_category > 0
+        self.use_infogan = args.use_infogan
+        self.save_graph = args.save_graph
+        self.log_folder = args.log_folder
+        self.optimizer = args.optimizer
         self.learning_rate = learning_rate
-        self.clamp_lower = float(args["--clamp_lower"])
-        self.clamp_upper = float(args["--clamp_upper"])
-        self.temporal_sigma = float(args["--temporal_sigma"])
-        self.temporal_beta = float(args["--temporal_beta"])
+        self.temporal_sigma = args.temporal_sigma
+        self.temporal_beta = args.temporal_beta
 
     def __repr__(self) -> str:
         """

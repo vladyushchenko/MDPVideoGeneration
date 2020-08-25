@@ -1,9 +1,3 @@
-"""
-Copyright (C) 2017 NVIDIA Corporation.
-
-All rights reserved.
-Licensed under the CC BY-NC-ND 4.0 license (https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode).
-"""
 import logging
 import os
 from datetime import datetime
@@ -12,21 +6,13 @@ from typing import Any
 from tensorboardX import SummaryWriter
 
 
-def set_logger() -> logging.Logger:
-    """
-    Set root logger.
-    """
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-    return logger
-
-
 class Logger:
     """
     Logger class for application.
     """
 
-    logger = set_logger()
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
     time = datetime.now()
 
     def __init__(self, log_dir: str) -> None:

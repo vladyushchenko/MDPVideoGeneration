@@ -25,8 +25,7 @@ class Trainer:
         Init call.
         """
         self._args = args
-        self.log_folder = self._args["<log_folder>"]
-        self.logger = Logger(self.log_folder)
+        self.logger = Logger(self._args.log_folder)
         self.logger.log(args)
         self.generator_trainer = self._create_generator_trainer()
         self.discriminator_trainers = self._create_discriminator_trainers()
@@ -35,7 +34,7 @@ class Trainer:
         """
         Create generator.
         """
-        gen_type = self._args["<generator>"]
+        gen_type = self._args.generator
         generator_factory = GeneratorTrainerFactory(self._args)
         return generator_factory.create_trainer(gen_type)
 
@@ -44,19 +43,19 @@ class Trainer:
         Create discriminators.
         """
 
-        dim_category = int(self._args["--dim_z_category"])
-        disc_types = self._args["<discriminators>"]
+        dim_category = self._args.dim_z_category
+        disc_types = self._args.discriminators
 
         if dim_category > 0:
             self.logger.log(
                 "Setting infogan to True, as dim_category is {}".format(dim_category), level=logging.WARNING
             )
-            self._args["--use_infogan"] = True
+            self._args.use_infogan = True
         else:
             self.logger.log(
                 "Setting infogan to False, as dim_category is {}".format(dim_category), level=logging.WARNING
             )
-            self._args["--use_infogan"] = False
+            self._args.use_infogan = False
 
         disc_factory = DiscriminatorTrainerFactory(self._args, self.generator_trainer.generator)
         discriminator_trainers = [disc_factory.create_trainer(disc_type) for disc_type in disc_types]
@@ -92,18 +91,12 @@ class Trainer:
         """
         Return the number of discriminator train iterations.
         """
-        args_disc_iter = int(self._args["--wgan_disc_iter"])
-        trainer_type = self._args["--trainer_type"]
+        trainer_type = self._args.trainer_type
 
         if trainer_type == "vanilla_gan":
             iter_num = 1
         elif trainer_type == "temporal_gan":
             iter_num = 1
-        elif trainer_type == "wasserstein_gan":
-            if (self.generator_trainer.gen_iterations < 25) or (self.generator_trainer.gen_iterations % 500 == 0):
-                iter_num = 100
-            else:
-                iter_num = args_disc_iter
         else:
             raise RuntimeError("Unvalid trainer type: {}".format(trainer_type))
         return iter_num
@@ -117,11 +110,11 @@ class Trainer:
         for trainer in self.discriminator_trainers:
             self.logger.log(trainer)
 
-        save_init_model = self._args["--snapshot_init"]
-        log_interval = int(self._args["--print_every"])
-        save_interval = int(self._args["--save_every"])
-        train_iterations = int(self._args["--batches"])
-        show_interval = int(self._args["--show_data_interval"])
+        save_init_model = self._args.snapshot_init
+        log_interval = self._args.print_every
+        save_interval = self._args.save_every
+        train_iterations = self._args.n_iterations
+        show_interval = self._args.show_data_interval
         show_data = show_interval > 0
 
         start_time = time.time()
@@ -158,7 +151,7 @@ class Trainer:
 
         if save_init_model:
             self.logger.log("Saving initinal snapshot ...")
-            self.save_models(self.log_folder, 0)
+            self.save_models(self._args.log_folder, 0)
 
         for batch_num in range(self.generator_trainer.gen_iterations + 1, train_iterations + 1):
             # Set all to train mode
@@ -209,8 +202,8 @@ class Trainer:
                 self.save_examples(batch_num)
 
             if (batch_num % save_interval == 0) or (batch_num == train_iterations):
-                self.save_models(self.log_folder, batch_num)
+                self.save_models(self._args.log_folder, batch_num)
 
             if safeguard.kill_now:
-                self.save_models(self.log_folder, batch_num)
+                self.save_models(self._args.log_folder, batch_num)
                 break

@@ -8,7 +8,7 @@ from typing import Union, Tuple, List
 import torch
 import torch.nn as nn
 from torch.nn.utils import weight_norm
-from mdp_video.models.mocogan_models import Noise
+from mdp_video.models.mocogan_models import NoiseLayer
 
 
 class Chomp3d(nn.Module):
@@ -160,7 +160,7 @@ class DilatedConvBlock(nn.Module):
     ):
         super().__init__()
         self.block = nn.Sequential(
-            Noise(use_noise, sigma=noise_sigma),
+            NoiseLayer(use_noise, sigma=noise_sigma),
             nn.Conv3d(
                 ch_in,
                 ch_out,

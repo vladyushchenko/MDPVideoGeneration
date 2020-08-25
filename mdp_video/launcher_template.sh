@@ -87,7 +87,7 @@ get_parameters()
     PARAM_CMD="$PARAM_CMD"' --n_temp_blocks '"$TCN_BLOCKS"
     PARAM_CMD="$PARAM_CMD"' --temporal_sigma '"$TEMPORAL_SIGMA"
     PARAM_CMD="$PARAM_CMD"' --temporal_beta '"$TEMPORAL_BETA"
-    PARAM_CMD="$PARAM_CMD"' --batches '"$ITERATIONS"
+    PARAM_CMD="$PARAM_CMD"' --n_iterations '"$ITERATIONS"
     PARAM_CMD="$PARAM_CMD"' --seed '"$SEED"
     PARAM_CMD="$PARAM_CMD"' --checkpoint "'"${CHECKPOINT}"'"'
 

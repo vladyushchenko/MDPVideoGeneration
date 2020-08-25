@@ -1,41 +1,7 @@
-"""
-Copyright (C) 2017 NVIDIA Corporation.  All rights reserved.
-
-Licensed under the CC BY-NC-ND 4.0 license
-(https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode).
-
-Sergey Tulyakov, Ming-Yu Liu, Xiaodong Yang, Jan Kautz, MoCoGAN: Decomposing Motion and Content for Video Generation
-https://arxiv.org/abs/1707.04993
-
-Generates multiple videos given a model and saves them as video files using ffmpeg
-
-Usage:
-    generate_videos.py [options] <model>
-
-Options:
-    -n, --num_videos=<count>                number of videos to generate [default: 10]
-    -o, --output_format=<ext>               save videos as [default: gif]
-    -f, --number_of_frames=<count>          generate videos with that many frames [default: 16]
-
-    --save_images                           save images as video
-    --ffmpeg=<str>                          ffmpeg executable (on windows should be ffmpeg.exe). Make sure
-                                            the executable is in your PATH [default: ffmpeg]
-    --seed                                  seed for reproducable results
-    --mosaic                                save mosaic
-    --col_videos=<count>                    Mosaic videos in each row/col [default: 10]
-    --diff                                  Calculates the difference between frame pairs
-    --framewise                             saves framewise comparison
-    --chunks                                save chunks
-    --chunk_size=<count>                    Length for video as chunk [default: 8]
-    --add_counter                           Add counter for mosaic
-    --img_ext=<str>                         Encoder for images [default: jpg]
-    --type=<str>                            [default: generator]
-    --artifact=<str>                        [default: ]
-    --add_noise_artifacts
-    --add_video_break
-    --border_list_good=<arg>                [default: ]
-    --border_list_bad=<arg>                 [default: ]
-"""
+#
+# Credit:
+#
+import argparse
 import os
 import shutil
 import subprocess as sp
@@ -49,14 +15,71 @@ import seaborn as sns
 import torch
 from PIL import Image
 from tqdm import tqdm
-import docopt
 
 from mdp_video.loaders.ucf_loader import make_dataset, video_loader
 from mdp_video.loaders.video_loaders import Loader
 from mdp_video.util import to_numpy, RealBatchSampler
 
 
-def save_video(video: Any, folder: str, filename: str, ffmpeg: str, ext: str) -> None:
+def get_parser() -> argparse.ArgumentParser:
+    """
+    Get program parser.
+    """
+    parser = argparse.ArgumentParser("Interence for MDP.")
+    parser.add_argument("--model", type=str, required=True, help="path to model")
+    parser.add_argument(
+        "--mode", type=str, default="generator", choices=["artifact", "generator", "image"], help="generation mode"
+    )
+    parser.add_argument("--artifact_name", type=str, default="", help="artifact name")
+
+    parser.add_argument("--num_videos", type=int, default=10, help="number of videos")
+    parser.add_argument("--n_frames", type=int, default=16, help="video length")
+    parser.add_argument("--col_videos", type=int, default=10, help="videos in each row/col of mosaic")
+    parser.add_argument("--chunks_size", type=int, default=8, help="length of video chunk")
+
+    parser.add_argument("--output_format", type=str, default="gif", help="output format")
+    parser.add_argument("--img_ext", type=str, default="png", help="image encoder")
+
+    parser.add_argument("--save_images", action="store_true", help="flag to save images")
+    parser.add_argument("--save_mosaic", action="store_true", help="flag to save mosaic")
+    parser.add_argument("--save_diff", action="store_true", help="flag to save image diff")
+    parser.add_argument("--save_framewise", action="store_true", help="saves framewise comparison")
+    parser.add_argument("--save_chunks", action="store_true", help="flag to save video chunks")
+
+    parser.add_argument("--add_counter", action="store_true", help="add counter to mosaic header")
+    parser.add_argument("--add_noise_artifacts", action="store_true", help="add hand crafted artifacts")
+    parser.add_argument("--add_video_break", action="store_true", help="add video breaks to video")
+    parser.add_argument("--fix_seed", action="store_true", help="fixes the seed across the application")
+    parser.add_argument("--cuda", action="store_true", help="enables cuda")
+
+    parser.add_argument("--border_list_good", type=int, nargs="+", help="mark listed items on a mosaic grid as correct")
+    parser.add_argument(
+        "--border_list_bad", type=int, nargs="+", help="mark listed items on a mosaic grid as incorrect"
+    )
+
+    parser.add_argument("--batch_size", type=int, default=1, help="batch size")
+    parser.add_argument("--image_size", type=int, default=64, help="target image size")
+
+    parser.add_argument("--n_iterations", type=int, default=100000, help="# of training iterations")
+    parser.add_argument("--n_channels", type=int, default=3, help="# of channels")
+    parser.add_argument("--every_nth", type=int, default=2, help="# of subsampling rate for video")
+    parser.add_argument("--num_workers", type=int, default=0, help="dataloader workers")
+
+    parser.add_argument("--non_artifact_length", type=int, default=16, help="non_artifact_length")
+    parser.add_argument("--noise_artifacts_std", type=float, default=0.01, help="std for noise artifacts")
+
+    parser.add_argument("--border_size", type=int, default=2, help="border_size in pixels")
+    parser.add_argument(
+        "--border_color_good", type=int, nargs="+", default=(0, 0, 255), help="border color for correct samples"
+    )
+    parser.add_argument(
+        "--border_color_bad", type=int, nargs="+", default=(255, 0, 0), help="border color for incorrect samples"
+    )
+
+    return parser
+
+
+def save_video(video: Any, folder: str, filename: str, ext: str) -> None:
     """
     Create video with ffmpeg from image sequence.
     """
@@ -64,7 +87,7 @@ def save_video(video: Any, folder: str, filename: str, ffmpeg: str, ext: str) ->
         os.makedirs(folder)
 
     command = [
-        ffmpeg,
+        "ffmpeg",
         "-y",
         "-f",
         "rawvideo",
@@ -87,7 +110,7 @@ def save_video(video: Any, folder: str, filename: str, ffmpeg: str, ext: str) ->
     ]
 
     pipe = sp.Popen(command, stdin=sp.PIPE)
-    pipe.stdin.write(video.tostring())
+    pipe.stdin.write(video.tostring())  # type: ignore
     pipe.communicate()
 
 
@@ -119,7 +142,7 @@ def save_video_sequence(video_seq: Any, out_folder: str, img_ext: str, video_nam
 
 
 # pylint: disable=R0914
-def generate_video(args: docopt.docopt, generator: Any, output_folder: str, saving_func: Any) -> None:
+def generate_video(args: argparse.Namespace, generator: Any, output_folder: str, saving_func: Any) -> None:
     """
     Create videos from generator samples.
     """
@@ -130,7 +153,7 @@ def generate_video(args: docopt.docopt, generator: Any, output_folder: str, savi
 
     for counter in tqdm(range(args.num_videos), total=args.num_videos):
         seed = None
-        if args.use_seed:
+        if args.fix_seed:
             seed = counter
         v, categories = generator.sample_videos(1, args.n_frames, seed)
 
@@ -172,7 +195,7 @@ def generate_video(args: docopt.docopt, generator: Any, output_folder: str, savi
             )
 
 
-def generate_chunk(args: docopt.docopt, generator: Any, output_folder: str) -> None:
+def generate_chunk(args: argparse.Namespace, generator: Any, output_folder: str) -> None:
     """
     Create videos from generator samples.
     """
@@ -183,7 +206,7 @@ def generate_chunk(args: docopt.docopt, generator: Any, output_folder: str) -> N
 
     for counter in tqdm(range(args.num_videos), total=args.num_videos):
         seed = None
-        if args.use_seed:
+        if args.fix_seed:
             seed = counter
         v, categories = generator.sample_videos(1, args.n_frames, seed)
 
@@ -196,7 +219,7 @@ def generate_chunk(args: docopt.docopt, generator: Any, output_folder: str) -> N
 
         video = to_numpy(v).squeeze().transpose((1, 2, 3, 0))
         video = video.transpose((0, 2, 1, 3))
-        video = video[:: args.chunks_stride]
+        video = video[:: args.chunks_size]
         rows, height, width, channels = video.shape
         video = video.reshape(rows * height, width, channels)
         video = video.transpose((1, 0, 2))
@@ -217,7 +240,7 @@ def generate_chunk(args: docopt.docopt, generator: Any, output_folder: str) -> N
 
 
 # pylint: disable=R0914
-def generate_mosaic(args: docopt.docopt, generator: Any, output_folder: str) -> None:
+def generate_mosaic(args: argparse.Namespace, generator: Any, output_folder: str) -> None:
     """
     Create mosaic videos from generator samples.
     """
@@ -231,7 +254,7 @@ def generate_mosaic(args: docopt.docopt, generator: Any, output_folder: str) -> 
     videos_list = []
     for counter in tqdm(range(args.col_videos), total=args.col_videos):
         seed = None
-        if args.use_seed:
+        if args.fix_seed:
             seed = counter
         video, _ = generator.sample_videos(args.col_videos, args.n_frames, seed)
 
@@ -288,7 +311,7 @@ def generate_mosaic(args: docopt.docopt, generator: Any, output_folder: str) -> 
 
 
 # pylint: disable=R0914
-def generate_border_mosaic(args: docopt.docopt, generator: Any, output_folder: str) -> None:
+def generate_border_mosaic(args: argparse.Namespace, generator: Any, output_folder: str) -> None:
     """
     Create mosaic videos from generator samples.
     """
@@ -302,7 +325,7 @@ def generate_border_mosaic(args: docopt.docopt, generator: Any, output_folder: s
     videos_list = []
     for counter in tqdm(range(args.col_videos * args.col_videos), total=args.col_videos * args.col_videos):
         seed = None
-        if args.use_seed:
+        if args.fix_seed:
             seed = counter
         video, _ = generator.sample_videos(1, args.n_frames, seed)
 
@@ -402,7 +425,7 @@ def generate_border_mosaic(args: docopt.docopt, generator: Any, output_folder: s
 
 
 # pylint: disable=R0915
-def generate_diff(args: docopt.docopt, generator: Any, output_folder: str) -> None:
+def generate_diff(args: argparse.Namespace, generator: Any, output_folder: str) -> None:
     """
     Create difference frames and confusion heatmap.
     """
@@ -413,7 +436,7 @@ def generate_diff(args: docopt.docopt, generator: Any, output_folder: str) -> No
 
     for counter in tqdm(range(args.num_videos), total=args.num_videos):
         seed = None
-        if args.use_seed:
+        if args.fix_seed:
             seed = counter
         v, categories = generator.sample_videos(1, args.n_frames, seed)
 
@@ -502,7 +525,7 @@ def generate_diff(args: docopt.docopt, generator: Any, output_folder: str) -> No
 
 
 # pylint: disable=R0914
-def generate_framewise_comparison(args: docopt.docopt, generator: Any, output_folder: str) -> None:
+def generate_framewise_comparison(args: argparse.Namespace, generator: Any, output_folder: str) -> None:
     """
     Create comparison between the most similar video difference.
     """
@@ -512,7 +535,7 @@ def generate_framewise_comparison(args: docopt.docopt, generator: Any, output_fo
 
     for counter in tqdm(range(args.num_videos), total=args.num_videos):
         seed = None
-        if args.use_seed:
+        if args.fix_seed:
             seed = counter
         v, categories = generator.sample_videos(1, args.n_frames, seed)
 
@@ -532,9 +555,9 @@ def generate_framewise_comparison(args: docopt.docopt, generator: Any, output_fo
         # plt.imshow(video)
 
         root_dir = ""
-        for dataset_name in args.datasets:
+        for dataset_name in ["actions", "shapes", "ucf_train", "ucf"]:
             if dataset_name in args.model:
-                data_dir = os.path.join(args.datasets_dir, "{}_raw".format(dataset_name))
+                data_dir = os.path.join(args.datasets_root, "{}_raw".format(dataset_name))
                 if os.path.isdir(data_dir):
                     root_dir = data_dir
                     break
@@ -590,7 +613,7 @@ def generate_framewise_comparison(args: docopt.docopt, generator: Any, output_fo
         )
 
 
-def launch_generation(args: docopt.docopt) -> None:
+def launch_generation(args: argparse.Namespace) -> None:
     """
     Launch generation.
     """
@@ -599,7 +622,7 @@ def launch_generation(args: docopt.docopt) -> None:
 
     print("Saving Videos ...")
     output_folder = os.path.join(args.output_folder, "Video")
-    saving_func = partial(save_video, ffmpeg=args.ffmpeg, ext=args.output_format)
+    saving_func = partial(save_video, ext=args.output_format)
 
     if args.mode == "generator":
 
@@ -645,53 +668,12 @@ class Arguments:
     Dataholder for docopt args.
     """
 
-    def __init__(self, args: docopt.docopt) -> None:
+    def __init__(self, args: argparse.Namespace) -> None:
         """
         Init call.
 
         :param args: program args
         """
-        self.model = args["<model>"]
-        self.location = args["<model>"]
-        self.mode = args["--type"]
-        self.num_videos = int(args["--num_videos"])
-        self.n_frames = int(args["--number_of_frames"])
-        self.calc_iter = self.num_videos
-        self.video_length = self.n_frames
-        self.output_folder = os.path.join(os.path.dirname(self.model), "SamplesLength_{}".format(self.n_frames))
-        self.save_images = args["--save_images"]
-        self.ffmpeg = args["--ffmpeg"]
-        self.output_format = args["--output_format"]
-        self.col_videos = int(args["--col_videos"])
-        self.use_seed = args["--seed"]
-        self.seed = 0
-        self.mosaic = args["--mosaic"]
-        self.diff = args["--diff"]
-        self.framewise = args["--framewise"]
-        self.datasets = ["actions", "shapes", "ucf_train", "ucf"]
-        self.datasets_dir = "/home/vlad/datasets"
-        self.every_nth = 2
-        self.save_chunks = args["--chunks"]
-        self.chunk_size = int(args["--chunk_size"])
-        self.add_counter = args["--add_counter"]
-        self.img_ext = args["--img_ext"]
-        self.image_size = 64
-        self.batch_size = 1
-        self.cuda = True
-        self.num_workers = 0
-        self.chunks_stride = 8
-        self.artifact = args["--artifact"]
-        self.non_artifact_length = 16
-        self.add_noise_artifacts = args["--add_noise_artifacts"]
-        self.noise_artifacts_std = 0.01
-        self.add_video_break = args["--add_video_break"]
-        self.border_list_good = (
-            list(map(int, args["--border_list_good"].split(","))) if args["--border_list_good"] else []
-        )
-        self.border_list_bad = list(map(int, args["--border_list_bad"].split(","))) if args["--border_list_bad"] else []
-        self.border_color_good = (0, 0, 255)
-        self.border_color_bad = (255, 0, 0)
-        self.border_size = 2
 
 
 class WrapperGenerator:
@@ -699,7 +681,7 @@ class WrapperGenerator:
     Wrapper for generator.
     """
 
-    def __init__(self, args: docopt.docopt) -> None:
+    def __init__(self, args: argparse.Namespace) -> None:
         """
         Init call.
         """
@@ -730,7 +712,11 @@ class WrapperGenerator:
 
 
 if __name__ == "__main__":
-    ARGS = docopt.docopt(__doc__)
-    ARGS = Arguments(ARGS)
+    PARSER = get_parser()
+    ARGS = PARSER.parse_args()
+    ARGS.output_folder = os.path.join(os.path.dirname(ARGS.model), "SamplesLength_{}".format(ARGS.n_frames))
+
+    assert len(ARGS.border_color_good) == 3
+    assert len(ARGS.border_color_bad) == 3
 
     launch_generation(ARGS)

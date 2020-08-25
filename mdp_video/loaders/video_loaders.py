@@ -90,7 +90,7 @@ class Sampler:
                 raw_images = []
                 for image in sequence:
                     image = image.squeeze()
-                    # we lose here some accuracy compared to linear due to float32 -> uint8 -> fload32
+                    # we lose here some accuracy compared to linear due to float32 -> uint8 -> float32
                     image = to_numpy(image).transpose(1, 2, 0)
                     image = Image.fromarray(image)
                     image = self._transforms(image)
@@ -310,7 +310,6 @@ class Loader:
             chainer.cuda.cupy.random.seed(self._args.seed)
             fsgen, vgen, _ = get_models(self._args.location, n_iter)
 
-            # load model
             if gpu >= 0:
                 fsgen.to_gpu()
                 vgen.to_gpu()
