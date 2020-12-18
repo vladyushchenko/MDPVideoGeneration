@@ -24,7 +24,7 @@ Coming soon
 Coming soon
 
 ## Download links
-Coming soon
+Final model checkpoints are available [here](https://drive.google.com/drive/folders/1O7WzXIApMliJ00iSlthz3UEsiI-ZHfHS?usp=sharing)
 
 ## License
 The code is provided for research purposes only.
