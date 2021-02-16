@@ -287,9 +287,9 @@ class Loader:
             return sample_provider
 
         elif self._args.mode == "generator":
-            print("Using generator {}".format(self._args.location))
+            print("Using generator {}".format(self._args.model))
 
-            generator = torch.load(self._args.location)
+            generator = torch.load(self._args.model)
             generator.eval()
             if self._args.cuda:
                 generator.cuda()

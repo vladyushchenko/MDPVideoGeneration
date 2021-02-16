@@ -14,7 +14,7 @@ def get_parser() -> argparse.ArgumentParser:
     """
     parser = argparse.ArgumentParser("Trainer for MDP")
     parser.add_argument("--dataset", type=str, required=True, help="dataset to train on")
-    parser.add_argument("--log_folder", type=str, required=True, help="loggind folder")
+    parser.add_argument("--log_folder", type=str, required=True, help="logging folder")
     parser.add_argument("--checkpoint", type=str, default="", help="checkpoint for models")
     parser.add_argument("--generator", type=str, required=True, help="generator name")
     parser.add_argument("--discriminators", type=str, nargs="+", required=True, help="discriminator names")

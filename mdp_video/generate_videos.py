@@ -1,5 +1,5 @@
 #
-# Credit:
+# Credits: https://github.com/sergeytulyakov/mocogan
 #
 import argparse
 import os
@@ -25,7 +25,7 @@ def get_parser() -> argparse.ArgumentParser:
     """
     Get program parser.
     """
-    parser = argparse.ArgumentParser("Interence for MDP.")
+    parser = argparse.ArgumentParser("Inference for MDP.")
     parser.add_argument("--model", type=str, required=True, help="path to model")
     parser.add_argument(
         "--mode", type=str, default="generator", choices=["artifact", "generator", "image"], help="generation mode"
@@ -223,11 +223,11 @@ def generate_chunk(args: argparse.Namespace, generator: Any, output_folder: str)
         rows, height, width, channels = video.shape
         video = video.reshape(rows * height, width, channels)
         video = video.transpose((1, 0, 2))
-        if rows < args.chunk_size:
+        if rows < args.chunks_size:
             return
         indices = [
-            height * args.chunk_size * (i + 1)
-            for i in range(0, (rows // args.chunk_size) - (1 if rows % args.chunk_size == 0 else 0))
+            height * args.chunks_size * (i + 1)
+            for i in range(0, (rows // args.chunks_size) - (1 if rows % args.chunks_size == 0 else 0))
         ]
         video = np.split(video, indices, axis=1)
         save_images(
@@ -585,7 +585,6 @@ def generate_framewise_comparison(args: argparse.Namespace, generator: Any, outp
                 global_min_item = item_dataset
 
         # load global images and stack them on top
-
         sampling_sequence = [
             (global_min_index + args.every_nth * i) % global_min_item["video_length"]  # type: ignore
             for i in range(args.n_frames)
@@ -647,33 +646,20 @@ def launch_generation(args: argparse.Namespace) -> None:
         output_folder = os.path.join(args.output_folder, "Chunks")
         generate_chunk(args, generator, output_folder)
 
-    if args.diff:
+    if args.save_diff:
         print("Saving Diff")
         output_folder = os.path.join(args.output_folder, "Diff")
         generate_diff(args, generator, output_folder)
 
-    if args.framewise:
+    if args.save_framewise:
         print("Saving Framewise Comparison")
         output_folder = os.path.join(args.output_folder, "Framewise")
         generate_framewise_comparison(args, generator, output_folder)
 
-    if args.mosaic:
+    if args.save_mosaic:
         print("Saving Mosaic ...")
         output_folder = os.path.join(args.output_folder, "Mosaic")
         generate_mosaic(args, generator, output_folder)
-
-
-class Arguments:
-    """
-    Dataholder for docopt args.
-    """
-
-    def __init__(self, args: argparse.Namespace) -> None:
-        """
-        Init call.
-
-        :param args: program args
-        """
 
 
 class WrapperGenerator:

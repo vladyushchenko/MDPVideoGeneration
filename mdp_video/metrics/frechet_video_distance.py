@@ -142,10 +142,15 @@ def start(args: argparse.Namespace) -> None:
             print("Setting seed {}".format(i + seed_offset))
             args.seed = i + seed_offset
         fake_args = args
+        fake_args.location = args.dataset_loc
         fake_loader = Loader(fake_args)()
         real_embeds, fake_embeds = [], []
 
-        sess = tf.Session()
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+        config.gpu_options.per_process_gpu_memory_fraction = 0.5
+
+        sess = tf.Session(config=config)
         sess.run(tf.global_variables_initializer())
         sess.run(tf.tables_initializer())
 
@@ -188,13 +193,14 @@ def get_parser() -> argparse.ArgumentParser:
     :return: parser
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("--location")
+    # Some parameters are needed for inference and some for loading ground truth
+    parser.add_argument("--model", type=str, help="generator checkpoint location")
+    parser.add_argument("--dataset_loc", type=str, help="dataset location")
     parser.add_argument("--mode", default="")
-    parser.add_argument("--dataset_loc")
-    parser.add_argument("--video_length", type=int)
+    parser.add_argument("--video_length", type=int, help="length of the videos")
     parser.add_argument("--batch_size", type=int, default=1)
     parser.add_argument("--image_size", type=int, default=64)
-    parser.add_argument("--cuda", action="store_false")
+    parser.add_argument("--cuda", action="store_true")
     parser.add_argument("--calc_iter", type=int, default=1)
     parser.add_argument("--num_workers", type=int, default=4)
     parser.add_argument("--seed", type=int, default=0)

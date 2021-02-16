@@ -135,7 +135,8 @@ def get_parser() -> argparse.ArgumentParser:
     :return: program parser
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("--location")
+    parser.add_argument("--model", default="")
+    parser.add_argument("--location", default="")
     parser.add_argument("--save_data", action="store_true")
     parser.add_argument("--mode", default="generator")
     parser.add_argument("--batch_size", type=int, default=1)
@@ -163,6 +164,8 @@ if __name__ == "__main__":
     PARSER = get_parser()
 
     ARGS = PARSER.parse_args()
-    ARGS.out_folder = os.path.join(os.path.dirname(ARGS.location), "TemporalMetrics_{}".format(ARGS.video_length))
+
+    out_folder = os.path.dirname(ARGS.model) if ARGS.model else os.path.dirname(ARGS.location)
+    ARGS.out_folder = os.path.join(out_folder, "TemporalMetrics_{}".format(ARGS.video_length))
 
     temporal_metrics(ARGS)

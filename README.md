@@ -18,10 +18,60 @@ Optionally, you can install the package with the following command
 `python setup.py install`
 
 ## Training
-Coming soon
+For training, we provide `mdp_video/launcher_template.sh` template training script.
+As a rule, you just need to set `dataset_root` location to start training,
+but you can also try different configurations of training parameters.
 
-## Inference
-Coming soon
+Some parameters are pre-set to train specific MDP model with `sigma=0.7` and `beta=0.9`,
+for more info, please refer to the paper or to `train.py` help to set your specific experiment.
+
+## Inference (generating videos and image)
+```python
+python -m mdp_video.generate_videos
+--model <path to generator checkpoint *.pytorch>
+--output_format gif
+--n_frames 64
+--num_videos 50
+--col_videos 10
+--save_images
+--fix_seed
+--save_mosaic
+--save_diff
+--save_chunks
+--add_counter
+--img_ext png
+```
+
+## Reproducing metrics
+To reproduce IS metrics, please refer to the `https://github.com/pfnet-research/tgan` repository.
+We include the normalization file, needed for the IS calculations.
+
+To reproduce FVD and temporal metrics, use PyCharm configurations from `.run` folder or these commands directly
+
+Temporal metrics
+```python
+python -m mdp_video.metrics.temporal_metric
+--model <path_to_model>
+--location <optional_path_to_dataset>
+--mode generator
+--num_workers 0
+--metric <psnr|dssim|ssim>
+--calc_iter 256
+--video_length 64
+```
+
+FVD from `https://github.com/google-research/google-research/blob/master/frechet_video_distance/frechet_video_distance.py` repo.
+```python
+python -m mdp_video.metrics.frechet_video_distance.py
+--model <path_to_model>
+--mode generator
+--dataset_loc <path_to_dataset>
+--calc_iter 256
+--seed 0
+--num_workers 0
+--video_length 64
+--cuda
+```
 
 ## Download links
 Final model checkpoints are available [here](https://drive.google.com/drive/folders/1O7WzXIApMliJ00iSlthz3UEsiI-ZHfHS?usp=sharing)
