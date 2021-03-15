@@ -4,6 +4,8 @@ Extract UCF dataset to folders.
 After moving all the files using the 1_ file, we run this one to extract
 the images from the videos and also create a data file we can use for
 training and testing later.
+
+Credits: the code was adapted from https://github.com/harvitronix/five-video-classification-methods
 """
 
 import argparse
@@ -32,8 +34,6 @@ def extract_files(root_path: str, ext: str) -> None:
         videos_paths = glob.glob(folder + "/**/*.avi", recursive=True)
 
         for item in videos_paths:
-
-            print(item)
             # Get the parts of the file.
             video_parts = get_video_parts(item)
 
@@ -106,8 +106,8 @@ if __name__ == "__main__":
     # [train|test], class, filename, nb frames
 
     PARSER = argparse.ArgumentParser("UCF extracting part 2.")
-    PARSER.add_argument("root_dir")
-    PARSER.add_argument("--ext", default="jpg")
+    PARSER.add_argument("--root_dir", type=str, required=True, help="Path to data directory")
+    PARSER.add_argument("--ext", type=str, default="png", help="images extension")
     ARGS = PARSER.parse_args()
 
     # unpack_videos(args.root_dir, args.ext)

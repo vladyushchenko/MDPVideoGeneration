@@ -17,6 +17,16 @@ Optionally, you can install the package with the following command
 
 `python setup.py install`
 
+## UCF-101 data extraction
+1) download UCF-101 dataset from [this website](`https://www.crcv.ucf.edu/data/UCF101.php`)
+2) unzip the archive to the target folder, which will contain raw UCF-101 videos.
+3) generate train/test splits from `ucfTrainTestlist`. We use `*01.txt` splits per default..
+   Use `mdp_video/transform/ucf_move_files.py` script for that.
+4) transform all video to separate images (you need to have FFmpeg installed).
+   Use `mdp_video/transform/ucf_extract_files.py` script for that.
+
+Launch templates for both scripts can be found in `.run` folder
+
 ## Training
 For training, we provide `mdp_video/launcher_template.sh` template training script.
 As a rule, you just need to set `dataset_root` location to start training,
@@ -77,7 +87,7 @@ python -m mdp_video.metrics.frechet_video_distance.py
 Final model checkpoints are available [here](https://drive.google.com/drive/folders/1O7WzXIApMliJ00iSlthz3UEsiI-ZHfHS?usp=sharing)
 
 ## License
-The code is provided for research purposes only.
+The code is provided for research purposes only. (Apache 2.0)
 
 ## Citation
 If you find this paper useful in your research, please consider citing the paper
