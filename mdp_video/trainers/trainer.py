@@ -8,7 +8,6 @@ from typing import Any, List
 
 import torch
 from tqdm import tqdm
-import docopt
 
 import mdp_video.util as util
 from mdp_video.logger import Logger
@@ -20,7 +19,7 @@ class Trainer:
     Class for model training loop.
     """
 
-    def __init__(self, args: docopt.docopt) -> None:
+    def __init__(self, args: Any) -> None:
         """
         Init call.
         """

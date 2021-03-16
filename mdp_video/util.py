@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from torchvision import utils as vu
-import docopt
 
 
 class LoggerDict(dict):
@@ -29,7 +28,7 @@ class Flags:
     Args holder for models trainers.
     """
 
-    def __init__(self, args: docopt.docopt, learning_rate: float) -> None:
+    def __init__(self, args: Any, learning_rate: float) -> None:
         """
         Init call.
 
@@ -130,7 +129,7 @@ class RealBatchSampler:
     Wrapper for endless batch sampling.
     """
 
-    def __init__(self, sampler: Any, args: docopt.docopt) -> None:
+    def __init__(self, sampler: Any, args: Any) -> None:
         self._batch_size: int = sampler.batch_size
         self._sampler = sampler
         self._enumerator: Optional[Any] = None

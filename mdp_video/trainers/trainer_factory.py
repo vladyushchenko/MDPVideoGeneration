@@ -8,7 +8,6 @@ from typing import Any, Optional
 import torch
 import torchvision.transforms
 from torch.utils.data import DataLoader
-import docopt
 
 import mdp_video.models as models
 import mdp_video.util as util
@@ -60,7 +59,7 @@ class DiscriminatorTrainerFactory:
     Factory for DiscriminatorTrainers.
     """
 
-    def __init__(self, args: docopt.docopt, generator: torch.nn.Module) -> None:
+    def __init__(self, args: Any, generator: torch.nn.Module) -> None:
         self._args = args
         self._generator = generator
 
@@ -251,7 +250,7 @@ class GeneratorTrainerFactory:
     Trainer factory for generators.
     """
 
-    def __init__(self, args: docopt.docopt) -> None:
+    def __init__(self, args: Any) -> None:
         """
         Init call.
         """

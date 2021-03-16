@@ -9,9 +9,6 @@ import torch.utils.data
 from PIL import Image
 from torch.nn.functional import interpolate
 from torchvision import transforms
-import docopt
-import chainer
-
 
 from mdp_video.loaders.ucf_loader import SplittedVideoDataset
 from mdp_video.util import to_numpy, RealBatchSampler
@@ -22,7 +19,7 @@ class Sampler:
     Sampler class.
     """
 
-    def __init__(self, generator: Any, transform: Callable, args: docopt.docopt) -> None:
+    def __init__(self, generator: Any, transform: Callable, args: Any) -> None:
         """
         Init call.
 
@@ -112,7 +109,7 @@ class ArtifactSampler:
     Wrapper for endless batch sampling.
     """
 
-    def __init__(self, sampler: Any, args: docopt.docopt, cuda: bool = True) -> None:
+    def __init__(self, sampler: Any, args: Any, cuda: bool = True) -> None:
         """
         Init call.
 
@@ -196,7 +193,7 @@ class Loader:
     Loader class.
     """
 
-    def __init__(self, args: docopt.docopt) -> None:
+    def __init__(self, args: Any) -> None:
         """
         Init call.
 
@@ -300,6 +297,7 @@ class Loader:
 
             sys.path.insert(0, "<path to tgan project>")  # isort:skip
             # pylint: disable = C0415
+            import chainer
             from infer import get_models
             from infer import make_video
 

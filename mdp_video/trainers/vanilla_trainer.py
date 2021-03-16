@@ -6,7 +6,6 @@ import torch.optim as optim
 from torch import nn
 from torch.autograd import Variable
 import torchviz
-import docopt
 
 import mdp_video.util as util
 
@@ -21,9 +20,7 @@ class VanillaDiscriminatorTrainer:
     Combines DataLoader and Discriminator model for training.
     """
 
-    def __init__(
-        self, discriminator: Any, data_sampler: Any, generator_sampler: Any, named_args: docopt.docopt
-    ) -> None:
+    def __init__(self, discriminator: Any, data_sampler: Any, generator_sampler: Any, named_args: Any) -> None:
         self.discriminator = discriminator
         self._real_sampler = data_sampler
         self._fake_sampler = generator_sampler
@@ -113,7 +110,7 @@ class VanillaGeneratorTrainer:
     Combine DataLoader and Generator model for training.
     """
 
-    def __init__(self, generator: Any, named_args: docopt.docopt, gen_iterations: int = 0) -> None:
+    def __init__(self, generator: Any, named_args: Any, gen_iterations: int = 0) -> None:
         """
         Init call.
 

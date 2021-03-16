@@ -7,7 +7,6 @@ from torch import nn
 from torch.autograd import Variable
 
 import torchviz
-import docopt
 
 from mdp_video.util import show_batch
 
@@ -22,9 +21,7 @@ class TemporalDiscriminatorTrainer:
     Get DataLoader and Discriminator model for TCN.
     """
 
-    def __init__(
-        self, discriminator: Any, data_sampler: Any, generator_sampler: Any, named_args: docopt.docopt
-    ) -> None:
+    def __init__(self, discriminator: Any, data_sampler: Any, generator_sampler: Any, named_args: Any) -> None:
         """
         Init call.
         """
@@ -199,7 +196,7 @@ class TemporalGeneratorTrainer:
     Combine DataLoader and Generator model for training.
     """
 
-    def __init__(self, generator: Any, named_args: docopt.docopt, gen_iterations: int = 0) -> None:
+    def __init__(self, generator: Any, named_args: Any, gen_iterations: int = 0) -> None:
         """
         Init call.
         """
