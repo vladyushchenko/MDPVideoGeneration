@@ -57,9 +57,10 @@ class Logger:
         """
         Save image summary to tensorboard.
         """
-        for img in images:
-            self.summary.add_image(tag, img.transpose(2, 0, 1), iteration)
-            self.summary.file_writer.flush()
+        for i, img in enumerate(images):
+            self.summary.add_image(f"{tag}_{i}", img.transpose(2, 0, 1), iteration)
+
+        self.summary.file_writer.flush()
 
     def video_summary(self, tag: str, videos: Any, iteration: int) -> None:
         """

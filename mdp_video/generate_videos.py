@@ -1,6 +1,10 @@
-#
-# Credits: https://github.com/sergeytulyakov/mocogan
-#
+"""
+Module for generating video results.
+
+Credits: code was adapted from https://github.com/sergeytulyakov/mocogan
+"""
+
+
 import argparse
 import os
 import shutil
@@ -552,7 +556,6 @@ def generate_framewise_comparison(args: argparse.Namespace, generator: Any, outp
         rows, height, width, channels = original_video.shape
         video = original_video.reshape(rows * height, width, channels)
         video = video.transpose((1, 0, 2))
-        # plt.imshow(video)
 
         root_dir = ""
         for dataset_name in ["actions", "shapes", "ucf_train", "ucf"]:
