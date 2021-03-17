@@ -1,18 +1,19 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="generate_videos" type="PythonConfigurationType" factoryName="Python">
-    <module name="MDPVideoGenerationPush" />
+  <configuration default="false" name="temporal_metric_template" type="PythonConfigurationType" factoryName="Python">
+    <module name="MDPVideoGeneration" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>
       <env name="PYTHONUNBUFFERED" value="1" />
     </envs>
     <option name="SDK_HOME" value="" />
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/mdp_video" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/mdp_video/metrics" />
     <option name="IS_MODULE_SDK" value="true" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/mdp_video/generate_videos.py" />
-    <option name="PARAMETERS" value="--model &lt;path_to_model&gt; --output_format gif --n_frames 64 --num_videos 50 --col_videos 10 --save_images --fix_seed --save_mosaic --save_diff --save_chunks --add_counter --img_ext png" />
+    <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/mdp_video/metrics/temporal_metric.py" />
+    <option name="PARAMETERS" value="--model &lt;path_to_model&gt; --location &lt;optional_path_to_dataset&gt; --mode generator --num_workers 0 --metric psnr --calc_iter 256 --video_length 64" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

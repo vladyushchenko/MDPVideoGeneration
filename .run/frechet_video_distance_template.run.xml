@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="temporal_metric" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
-    <module name="MDPVideoGenerationPush" />
+  <configuration default="false" name="frechet_video_distance_template" type="PythonConfigurationType" factoryName="Python">
+    <module name="MDPVideoGeneration" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>
@@ -11,8 +11,9 @@
     <option name="IS_MODULE_SDK" value="true" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/mdp_video/metrics/temporal_metric.py" />
-    <option name="PARAMETERS" value="--model &lt;path_to_model&gt; --location &lt;optional_path_to_dataset&gt; --mode generator --num_workers 0 --metric psnr --calc_iter 256 --video_length 64" />
+    <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/mdp_video/metrics/frechet_video_distance.py" />
+    <option name="PARAMETERS" value="--model &lt;path_to_model&gt; --mode generator --dataset_loc &lt;path_to_dataset&gt; --calc_iter 256 --seed 0 --num_workers 0 --video_length 64 --cuda" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

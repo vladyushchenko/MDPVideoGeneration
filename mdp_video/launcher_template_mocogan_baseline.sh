@@ -1,18 +1,19 @@
-# Cuda Device configuration
-DEVICE=0
+# Training configuration for baseline mocogan model
+
+DEVICE='0'
 PYTHON_PATH='<path tp conda env>/bin/python'
 PROJECT_FOLDER='<project folder>'
 SCRIPT_NAME="$PROJECT_FOLDER"'/src/train.py'
 DATASET='<dataset>'
 OUT_FOLDER_BASE='<results folder>'
-TRAINER_TYPE='vanilla_gan'
 
-# Model configuration
+# Note: provide checkpoint to start training from it
 # CHECKPOINT=''
 MODEL_NAME='Baseline'
-MODEL_LIST='VideoGenerator PatchImageDiscriminator PatchVideoDiscriminator'
+TRAINER_TYPE='vanilla_gan'
+MODEL_GENERATOR='VideoGenerator'
+MODEL_DISCRIMINATORS='PatchImageDiscriminator PatchVideoDiscriminator'
 OPT_SUFFIX=''
-SEED=0
 
 # Model Flags
 FULL_DETERMINISTIC=true
@@ -21,11 +22,12 @@ USE_CATEGORIES_GEN=false
 USE_CATEGORIES_DISC=false
 
 # Model parameters
+SEED=0
 BATCH_SIZE=32
 NOISE_SIGMA=0.1
 PRINT_EVERY=1
 SAVE_EVERY=10000
-SHOW_DATA_INTERVAL=1000
+SHOW_DATA_INTERVAL=2000
 NUM_WORKERS=4
 SAMPLING_FREQUENCY=2
 DIM_CONTENT=50
@@ -33,12 +35,6 @@ DIM_MOTION=10
 DIM_CATEGORY=0
 TRAINING_LENGTH=16
 ITERATIONS=100000
-
-# Temporal Settings
-TCN_KERNEL_SIZE=3
-TCN_BLOCKS=3
-TEMPORAL_SIGMA=0.9
-TEMPORAL_BETA=0.7
 
 # Trim to basename, then trim last underscore
 DATASET_BASENAME=${DATASET##*/}
@@ -68,6 +64,11 @@ fi
 
 # Construct output folder
 OUT_FOLDER="$OUT_FOLDER_BASE"'/'"$DATASET_BASENAME""$SUFFIX_CAT"'/'"$MODEL_NAME""$SUFFIX_NOISE""$SUFFIX_DETER"/Seed_"$SEED""$OPT_SUFFIX"/TrainLength_"$TRAINING_LENGTH"/Batch_"$BATCH_SIZE"
+mkdir -p "$OUT_FOLDER"
+
+git --git-dir="$PROJECT_FOLDER"'/.git' --work-tree="$PROJECT_FOLDER" log -1 > "$OUT_FOLDER"'/CurrentRevision.out'
+echo -e '\n##### DIFF to REVISION #####\n' >> "$OUT_FOLDER"'/CurrentRevision.out'
+git --git-dir="$PROJECT_FOLDER"'/.git' --work-tree="$PROJECT_FOLDER" diff >> "$OUT_FOLDER"'/CurrentRevision.out'
 
 get_parameters()
 {
@@ -83,10 +84,6 @@ get_parameters()
     PARAM_CMD="$PARAM_CMD"' --dim_z_category '"$DIM_CATEGORY"
     PARAM_CMD="$PARAM_CMD"' --video_length '"$TRAINING_LENGTH"
     PARAM_CMD="$PARAM_CMD"' --trainer_type '"$TRAINER_TYPE"
-    PARAM_CMD="$PARAM_CMD"' --temporal_kernel_size '"$TCN_KERNEL_SIZE"
-    PARAM_CMD="$PARAM_CMD"' --n_temp_blocks '"$TCN_BLOCKS"
-    PARAM_CMD="$PARAM_CMD"' --temporal_sigma '"$TEMPORAL_SIGMA"
-    PARAM_CMD="$PARAM_CMD"' --temporal_beta '"$TEMPORAL_BETA"
     PARAM_CMD="$PARAM_CMD"' --n_iterations '"$ITERATIONS"
     PARAM_CMD="$PARAM_CMD"' --seed '"$SEED"
     PARAM_CMD="$PARAM_CMD"' --checkpoint "'"${CHECKPOINT}"'"'
@@ -100,11 +97,11 @@ get_parameters()
     fi
 
     if [ $USE_CATEGORIES_GEN ]; then
-            PARAM_CMD="$PARAM_CMD"' --use_infogan'
+        PARAM_CMD="$PARAM_CMD"' --use_infogan'
     fi
 
     if [ $USE_CATEGORIES_DISC ]; then
-            PARAM_CMD="$PARAM_CMD"' --use_categories'
+        PARAM_CMD="$PARAM_CMD"' --use_categories'
     fi
 
     echo "$PARAM_CMD"
@@ -112,13 +109,8 @@ get_parameters()
 
 PARAMETERS="$(get_parameters)"
 
-CMD="CUDA_VISIBLE_DEVICES=${DEVICE} ${PYTHON_PATH} ${SCRIPT_NAME} ${PARAMETERS} ${DATASET} ${OUT_FOLDER} ${MODEL_LIST}"
+CMD="CUDA_VISIBLE_DEVICES=${DEVICE} ${PYTHON_PATH} ${SCRIPT_NAME} ${PARAMETERS} --dataset ${DATASET} --log_folder ${OUT_FOLDER} --generator ${MODEL_GENERATOR} --discriminators ${MODEL_DISCRIMINATORS}"
 echo "$CMD"
 eval "$CMD"
-wait
-
-git --git-dir="$PROJECT_FOLDER"'/.git' --work-tree="$PROJECT_FOLDER" log -1 > "$OUT_FOLDER"'/CurrentRevision.out'
-echo -e '\n##### DIFF to REVISION #####\n' >> "$OUT_FOLDER"'/CurrentRevision.out'
-git --git-dir="$PROJECT_FOLDER"'/.git' --work-tree="$PROJECT_FOLDER" diff >> "$OUT_FOLDER"'/CurrentRevision.out'
 wait
 exit
