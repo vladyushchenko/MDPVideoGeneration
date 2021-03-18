@@ -11,9 +11,11 @@ Create a conda environment using:
 
 `conda env create -f environment.yml`
 
-Note: there may be some additional dependencies that are no longer needed
+Or install packages from requirements.
 
-Optionally, you can install the package with the following command
+`pip insatll -r requirements.txt`
+
+Optionally, you can install the package itself with the following command
 
 `python setup.py install`
 
