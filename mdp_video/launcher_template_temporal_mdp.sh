@@ -3,7 +3,7 @@
 DEVICE='0'
 PYTHON_PATH='<path tp conda env>/bin/python'
 PROJECT_FOLDER='<project folder>'
-SCRIPT_NAME="$PROJECT_FOLDER"'/src/train.py'
+SCRIPT_NAME="$PROJECT_FOLDER"'/mdp_video/train.py'
 DATASET='<dataset>'
 OUT_FOLDER_BASE='<results folder>'
 
@@ -25,11 +25,10 @@ TEMPORAL_BETA=0.7
 FULL_DETERMINISTIC=true
 USE_NOISE=true
 USE_CATEGORIES_GEN=false
-USE_CATEGORIES_DISC=false
 
 # Model parameters
 SEED=0
-BATCH_SIZE=32
+BATCH_SIZE=16
 NOISE_SIGMA=0.1
 PRINT_EVERY=1
 SAVE_EVERY=10000
@@ -110,10 +109,6 @@ get_parameters()
         PARAM_CMD="$PARAM_CMD"' --use_infogan'
     fi
 
-    if [ $USE_CATEGORIES_DISC ]; then
-        PARAM_CMD="$PARAM_CMD"' --use_categories'
-    fi
-
     echo "$PARAM_CMD"
 }
 
@@ -121,6 +116,8 @@ PARAMETERS="$(get_parameters)"
 
 CMD="CUDA_VISIBLE_DEVICES=${DEVICE} ${PYTHON_PATH} ${SCRIPT_NAME} ${PARAMETERS} --dataset ${DATASET} --log_folder ${OUT_FOLDER} --generator ${MODEL_GENERATOR} --discriminators ${MODEL_DISCRIMINATORS}"
 echo "$CMD"
+export PYTHONPATH=${PROJECT_FOLDER}
+echo "$PYTHONPATH"
 eval "$CMD"
 wait
 exit

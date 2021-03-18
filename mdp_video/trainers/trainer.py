@@ -149,7 +149,7 @@ class Trainer:
         self.logger.log("Use CuDNN: {}".format(torch.backends.cudnn.enabled))
 
         if save_init_model:
-            self.logger.log("Saving initinal snapshot ...")
+            self.logger.log("Saving initial snapshot ...")
             self.save_models(self._args.log_folder, 0)
 
         for batch_num in range(self.generator_trainer.gen_iterations + 1, train_iterations + 1):
@@ -188,10 +188,11 @@ class Trainer:
                 self.logger.log(add_string)
 
                 for tag, value in list(logs.items()):
-                    if isinstance(value, dict):
-                        for hist_tag, hist_val in value.items():
-                            self.logger.histogram_summary(hist_tag, hist_val, batch_num)
-                    else:
+                    # if isinstance(value, dict):
+                    #     for hist_tag, hist_val in value.items():
+                    #         self.logger.histogram_summary(hist_tag + "0", hist_val, batch_num)
+                    # else:
+                    if not isinstance(value, dict):
                         self.logger.scalar_summary(tag, value / log_interval, batch_num)
 
                 start_time = time.time()

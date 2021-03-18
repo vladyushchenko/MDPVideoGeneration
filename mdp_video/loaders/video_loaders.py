@@ -286,6 +286,8 @@ class Loader:
         elif self._args.mode == "generator":
             print("Using generator {}".format(self._args.model))
 
+            # Note: old-style loading not working due to pickle
+            sys.path.insert(0, f"{os.path.dirname(__file__)}/..")
             generator = torch.load(self._args.model)
             generator.eval()
             if self._args.cuda:
